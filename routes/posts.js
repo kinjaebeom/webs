@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
+/* posts page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express', pageName: 'home.ejs' });
+  res.render('posts', { title: '익스프레스', name: '홍길동' });
 });
 
 module.exports = router;
