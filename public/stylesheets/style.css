@@ -8,3 +8,21 @@
 * {
   font-family: 'GmarketSansMedium';
 }
+
+a {
+  color: #00B7FF;
+}
+
+@media screen and (max-width: 960px) {
+  #img_header {
+      display: none;
+  }
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
