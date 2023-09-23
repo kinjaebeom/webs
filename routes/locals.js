@@ -1,9 +1,10 @@
 var express = require('express');
 var router = express.Router();
 
-/* posts page. */
+/* 지역검색 */
 router.get('/', function(req, res, next) {
-  res.render('posts', { title: '익스프레스', name: '홍길동' });
+    res.render('index', { title: '지역검색', pageName: 'locals/search.ejs' });
+  
 });
 
 module.exports = router;

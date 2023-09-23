@@ -1,0 +1,79 @@
+<div class="row my-5">
+    <div class="col">
+        <h1 class="text-center">지역검색</h1>
+        <div class="row mb-3 justify-content-end">
+            <form name="frm" class="col-6 col-md-4 col-lg-3">
+              <div class="input-group">
+                <input name="query" class="form-control" type="text" value="인하대학교" />
+                <button class="btn btn-primary">검색</button>
+              </div>
+            </form>
+          </div>
+          <hr>
+        <div id="div_locals"></div>
+        <div class="text-center">
+            <button class="btn btn-primary" id="prev">이전</button>
+            <span id="span_page">1/10</span>
+            <button class="btn btn-primary" id="next">다음</button>
+          </div>
+        </div>
+    </div>
+</div>
+<!--템플릿-->
+<script type=""x-handlebar-template id="temp_locals">
+    <table class="table">
+        {{#each documents}}
+        <tr>
+            <td>{{place_name}}</td>
+            <td>{{address_name}}</td>
+            <td>{{phone}}</td>
+        </tr>
+        {{/each}}
+    </table>
+</script>
+
+<script>
+    let page=1;
+    let query=$(frm.query).val();
+
+    $(frm).on("submit", function(e){
+        e.preventDefault();
+        query=$(frm.query).val();
+        page=1;
+        getlocals();
+    });
+  
+    $("#prev").on("click", function () {
+        page -- ;
+        getlocals();
+      });
+      
+      $("#next").on("click", function () {
+        page ++ ;
+        getlocals();
+      });
+    getlocals();
+    function getlocals(){
+        $.ajax({
+            type:"get",
+            url:"https://dapi.kakao.com/v2/local/search/keyword.json",
+            headers: { "Authorization": "KakaoAK e3e46827f9bf192337a7b50ccc7835a0" },
+            data:{page:page, query:query, size:5},
+            success:function(data){
+                console.log(data);
+                temp=Handlebars.compile($("#temp_locals").html());
+                $("#div_locals").html(temp(data));
+
+                let last = Math.ceil(data.meta.pageable_count / 6);
+                $("#span_page").html(page + "/" + last);
+    
+                if (page == 1) $("#prev").attr("disabled", true);
+                else $("#prev").attr("disabled", false);
+
+
+                if (data.meta.is_end) $("#next").attr("disabled", true);
+                else $("#next").attr("disabled", false);
+        },
+        });
+    }
+  </script>
