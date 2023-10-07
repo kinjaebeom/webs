@@ -1,0 +1,47 @@
+<style>
+    form span{
+        width:100px;
+    }
+</style>
+<div class="row my-5 justify-content-center">
+    <div class="col-6">
+        <h1 class="text-center">회원가입</h1>
+        <form name="frm" class="card p-3">
+            <div class="input-group mb-3">
+                <span class="input-group-text">이메일</span>
+                <input name="email" class="form-control" value="blue@test.com">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">비밀번호</span>
+                <input name="password" class="form-control" type="password" value="12341234">
+            </div>
+            <button class="btn btn-primary w-100">회원가입</button>
+        </form>
+    </div>
+</div>
+<script type="module">
+    import { app } from "/javascripts/firebaseInit.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+    const auth = getAuth(app);
+
+    $(frm).on("submit",function(e){
+        e.preventDefault();
+        //유효성 체크
+        const email=$(frm.email).val();
+        const password=$(frm.password).val();
+        if(email.includes("@") == false){
+            alert("이메일 형식으로 입력하세요!");
+        }else if(password.length < 8){
+            alert("비밀번호를 8자리이상 입력하세요!");          
+        }else{
+            //회원가입
+            createUserWithEmailAndPassword(auth,email,password).then(success=>{
+                alert("회원가입이 성공했습니다!");
+                location.href="/users/login";
+            }).catch(error=>{
+                alert("이미 등록됐어 이자식아!");
+            });
+        }
+
+    });
+</script>

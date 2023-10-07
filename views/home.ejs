@@ -2,6 +2,10 @@
   #div_books img{
     cursor:pointer;
   }
+  #div_books .bi-cart{
+    cursor: pointer;
+    color: green;
+  }
 </style>
 <div class="my-5 row">
     <div class="col">
@@ -33,6 +37,7 @@
           </div>
           <div class="card-footer">
             {{fmtPrice price}}
+            <i class="bi bi-cart float-end" book="{{book @this}}"></i>
           </div>
         </div>
       </div>
@@ -51,12 +56,39 @@
     });
     Handlebars.registerHelper("fmtPrice", function(price){
       if(price) return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '원';
-    })
+    });
+    Handlebars.registerHelper("book", function(book){ //위에 this가 펑션에 들어옴
+      return JSON.stringify(book);
+    });
   </script>
-  <script>
-    //value값을 query 변수에 저장
-    let query = $(frm.query).val();
-    let page = 1;
+  <script type="module">
+    import { app } from '/javascripts/firebaseInit.js';
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+    const db = getDatabase(app);
+
+    let query=$(frm.query).val();
+    let page=1;
+    // 장바구니 아이콘을 클릭했을 때
+    $("#div_books").on("click", ".bi-cart", async function(){
+        if(!sessionStorage.getItem("email")){
+            location.href="/users/login";
+        } else {
+            // 장바구니에 상품정보저장
+            const book=JSON.parse($(this).attr("book"));
+            console.log(book);
+            const ref_book = `cart/${sessionStorage.getItem('uid')}/${book.isbn}`;
+            // const ref_book = "/cart/" + sessionStorage.getItem("uid") + "/"
+            // 장바구니에 도서가 있는지 체크
+            const snapshot = await get(ref(db, ref_book));
+            if(snapshot.val()){
+                alert("장바구니에 이미 있습니다");
+            }else{
+                if(!confirm("장바구니에 담으실건가요?")) return;
+                set(ref(db, ref_book), book);
+                alert("장바구니에 담았습니다!");
+            }
+        }
+    });
     //이미지를 클릭했을때
     $("#div_books").on("click", "img", function(){
       let index=$(this).attr("index");
