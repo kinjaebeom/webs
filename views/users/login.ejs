@@ -10,11 +10,11 @@
         <form name="frm" class="card p-3">
             <div class="input-group mb-3">
                 <span class="input-group-text">이메일</span>
-                <input name="email" class="form-control" value="blue@test.com">
+                <input name="email" class="form-control" value="blue@test.com"> 
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text">비밀번호</span>
-                <input name="password" class="form-control" type="password" value="12341234">
+                <input name="password" class="form-control" type="password" value="12341234"> <!--인풋 테그 가리고 맞추는 단답형으로 40개-->
             </div>
             <button class="btn btn-primary w-100">로그인</button>
         </form>
@@ -24,13 +24,13 @@
     </div>
 </div>
 <script type="module">
-    import { app } from "/javascripts/firebaseInit.js";
+    import { app } from "/javascripts/firebaseInit.js"; //  /가 public을 얘기하는것임. 여기서 app지우고 맞추는 문제
     import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
-    const auth = getAuth(app);
+    const auth = getAuth(app); //여기에 auth괄호 함. 다 문제 속에 답이 있으니깐 대충 원리만 이해할 것.
     //이름이 아닌 아이디일 경우 #frm
     $(frm).on("submit", function(e){
-        e.preventDefault();
+        e.preventDefault(); //반응 없애주기.
         const email=$(frm.email).val();
         const password=$(frm.password).val();
        
@@ -43,13 +43,13 @@
             $(frm.password).focus();
         }else{
             //로그인체크
-            signInWithEmailAndPassword(auth, email, password).then(success=>{
+            signInWithEmailAndPassword(auth, email, password).then(success=>{ //signInWithEmailAndPassword를 사용 파이어베이스 제공 함수 firebase-auth사용 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";잘 찾아보기
                 //로그인 성공
                 console.log(success);
-                sessionStorage.setItem("email",email);
+                sessionStorage.setItem("email",email); //여기서 session은 저장해주는 장치.
                 sessionStorage.setItem("uid",success.user.uid);
                 alert("로그인에 성공하셨습니다."); //f12에서 application에 세션스토리지에서 확인가능
-                location.href="/";
+                location.href="/"; //성공하고 루트로 이동.
             }).catch(error=>{
                 alert(error.message);
             });

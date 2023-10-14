@@ -1,43 +1,46 @@
 <nav class="navbar navbar-expand-lg  bg-primary" data-bs-theme="dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="/">HOME</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">HOME</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/books">도서검색</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/locals">지역검색</a>
+        </li>
+        <li class="nav-item" id="cart" style="display:none;">
+          <a class="nav-link active" aria-current="page" href="/books/cart">장바구니</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav d-flex"> <!--오른쪽 메뉴, 디스플레이 = none으로 하면 가림. 세션스토리지에 값이 있으면 로그인 안한 것 -->
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/books">도서검색</a>
+            <a class="nav-link active" id="login" aria-current="page" href="/users/login">LOGIN</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/locals">지역검색</a>
+          <li class="nav-item" id="email" style="display:none">
+            <a class="nav-link active" aria-current="page" href="/users/mypage">email</a>
+          </li>
+          <li class="nav-item" id="logout" style="display:none">
+            <a class="nav-link active" aria-current="page" href="/users/logout">LOGOUT</a>
           </li>
         </ul>
-        <ul class="navbar-nav d-flex">
-            <li class="nav-item">
-              <a class="nav-link active" id="login" aria-current="page" href="/users/login">LOGIN</a>
-            </li>
-            <li class="nav-item" id="email" style="display:none">
-              <a class="nav-link active" aria-current="page" href="/users/mypage">email</a>
-            </li>
-            <li class="nav-item" id="logout" style="display:none">
-              <a class="nav-link active" aria-current="page" href="/users/logout">LOGOUT</a>
-            </li>
-          </ul>
-      </div>
     </div>
+  </div>
 </nav>
 <script>
-  if(sessionStorage.getItem("email")){
-    $("#login, #email, #logout").toggle(); //토글을 쓰면 보이는건 안보이게 안보이는건 보이게 한다.
-    $("#email a").html(sessionStorage.getItem("email"));
-  }
+if(sessionStorage.getItem("email")){
+  $("#login, #email, #logout, #cart").toggle(); //토글을 쓰면 보이는건 안보이게 안보이는건 보이게 한다. 앞에 #이면 아이디이다.
+  $("#email a").html(sessionStorage.getItem("email")); //이부분을 통해 로그인하고 이메일을 보이게 함.
+}
 
-  $("#logout").on("click","a", function(e){
-    e.preventDefault();//preventDefault 반응을 없애준다.
-    if(confirm("정말로 로그아웃하실래요?")){
-      sessionStorage.clear();
-      location.href="/";
-    }
-  });
+$("#logout").on("click","a", function(e){ //로그아웃에 a태그를 눌렀을때 이동하지 말라고 프리벤트 해줌.
+  e.preventDefault();//preventDefault 반응을 없애준다.
+  if(confirm("정말로 로그아웃하실래요?")){
+    sessionStorage.clear(); //세션스토리지의 값을 지워줘야한다. clear사용.
+    location.href="/";
+  }
+});
 </script>

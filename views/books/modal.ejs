@@ -1,5 +1,11 @@
 <!-- Modal -->
 <div class="modal fade" id="modal{{@index}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <!-- 이 부분은 모달 창을 정의하고 있습니다.
+  여기서 modal fade는 모달 창이 나타날 때 애니메이션 효과를 적용
+  id="modal{{@index}}이부분은 고유한 ID값을 위해 index번호를 사용
+  data-bs-backdrop="static"은 모달 창 바깥을 클릭해도 모달이 사라지지 않도록 설정
+  data-bs-keyboard="false 을 사용하여 사용자가 키보드로 마달을 닫을 수 없다.
+   -->
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
@@ -10,6 +16,8 @@
             <div class="row">
                 <div class="col-4">
                     <img src="{{chkImage thumbnail}}" width="90%">
+                    <!-- 이 부분은 HTML 코드에서 이미지를 표시하는 부분입니다. 이 부분은 템플릿 엔진의 동적 데이터를 이용하여 이미지를 출력하고 있습니다.
+                    동적으로 데이터를 삽입 -->
                 </div>
                 <div class="col-8">
                     <h5>{{title}}</h5>

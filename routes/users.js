@@ -8,7 +8,7 @@ router.get('/', function(req, res, next) {
 //로그인 페이지
 //post는 데이터 받아서 넘길때 여기선 get으로
 router.get('/login',function(req, res){
-  res.render('index',{title:'로그인', pageName:'users/login.ejs'})
+  res.render('index',{title:'로그인', pageName:'users/login.ejs'}) //인덱스를 통해서 페이지를 출력
 });
 module.exports = router;
 //회원가입 페이지
