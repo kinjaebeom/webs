@@ -27,53 +27,85 @@
             <td>{{place_name}}</td>
             <td>{{address_name}}</td>
             <td>{{phone}}</td>
+            <td><button class="btn btn-primary btn-sm" local="{{toString @this}}">즐겨찾기</button></td>
         </tr>
         {{/each}}
     </table>
 </script>
-
 <script>
-    let page=1;
-    let query=$(frm.query).val();
+    Handlebars.registerHelper("toString", function(local){
+        return JSON.stringify(local); //object -> string으로 변환
+    })
+</script>
 
-    $(frm).on("submit", function(e){
-        e.preventDefault();
-        query=$(frm.query).val();
-        page=1;
-        getlocals();
-    });
+
+<script type="module">
+  import { app } from "/javascripts/firebaseInit.js";
+  import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+ const db = getDatabase(app);
+
+ let page=1;
+ let query=$(frm.query).val();
+
+ $(frm).on("submit", function(e){
+     e.preventDefault();
+     query=$(frm.query).val();
+     page=1;
+     getlocals();
+ });
+
+ //즐겨찾기 버튼 누른경우
+ $("#div_locals").on("click",".btn-sm", async function(){
+   if(!sessionStorage.getItem("email")){
+     sessionStorage.setItem("target","/locals");
+     location.href="/users/login";
+   }else{ // 로그인이 된 경우
+     const local=JSON.parse($(this).attr("local"));
+     console.log(local);
+     const ref_local=`favorite/${sessionStorage.getItem("uid")}/${local.id}`;
+     const snapshot = await get(ref(db, ref_local));     //get은 비동기함수여서 동시에 실행
+     //console.log(snapshot.val());
+     if(snapshot.val()){
+       alert("이미 등록되었습니다.");
+     }else{
+       await set(ref(db, ref_local), local);        //없으면 등록
+       alert("즐겨찾기에 등록되었습니다.");
+     }
+   }
+ });
+
+ $("#prev").on("click", function () {
+     page -- ;
+     getlocals();
+   });
+   
+   $("#next").on("click", function () {
+     page ++ ;
+     getlocals();
+   });
+ getlocals();
+ function getlocals(){
+     $.ajax({
+         type:"get",
+         url:"https://dapi.kakao.com/v2/local/search/keyword.json",
+         headers: { "Authorization": "KakaoAK 4e9d829bf448e8a93d24aa307ca00c25" },
+         data:{page:page, query:query, size:5},
+         success:function(data){
+             console.log(data);
+             let temp=Handlebars.compile($("#temp_locals").html());
+             $("#div_locals").html(temp(data));
+
+             let last = Math.ceil(data.meta.pageable_count / 5);
+             $("#span_page").html(page + "/" + last);
+ 
+             if (page == 1) $("#prev").attr("disabled", true);
+             else $("#prev").attr("disabled", false);
+
+
+             if (data.meta.is_end) $("#next").attr("disabled", true);
+             else $("#next").attr("disabled", false);
+     },
+     });
+ }
+</script>
   
-    $("#prev").on("click", function () {
-        page -- ;
-        getlocals();
-      });
-      
-      $("#next").on("click", function () {
-        page ++ ;
-        getlocals();
-      });
-    getlocals();
-    function getlocals(){
-        $.ajax({
-            type:"get",
-            url:"https://dapi.kakao.com/v2/local/search/keyword.json",
-            headers: { "Authorization": "KakaoAK e3e46827f9bf192337a7b50ccc7835a0" },
-            data:{page:page, query:query, size:5},
-            success:function(data){
-                console.log(data);
-                temp=Handlebars.compile($("#temp_locals").html());
-                $("#div_locals").html(temp(data));
-
-                let last = Math.ceil(data.meta.pageable_count / 6);
-                $("#span_page").html(page + "/" + last);
-    
-                if (page == 1) $("#prev").attr("disabled", true);
-                else $("#prev").attr("disabled", false);
-
-
-                if (data.meta.is_end) $("#next").attr("disabled", true);
-                else $("#next").attr("disabled", false);
-        },
-        });
-    }
-  </script>
