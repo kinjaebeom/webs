@@ -1,0 +1,112 @@
+<style>
+    #photo{
+        width: 200px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 1px solid gray;
+    }
+    #file{
+        display: none;
+    }
+</style>
+
+<div class="my-5">
+    <h1 class="text-center mb-5">마이페이지</h1>
+    <div class="row justify-content-center">
+        <div class="col-8">
+            <div class="text-center mb-5">
+                <img src="http://via.placeholder.com/200X200" id="photo"/>
+                <input type="file" id="file">
+            </div>
+            <form name="frm" class="card p-3">
+                <div class="input-group mb-2">
+                    <span class="input-group-text">이름</span>
+                    <input name="name" class="form-control"/>
+                </div>
+                <div class="input-group mb-2">
+                    <span class="input-group-text">전화</span>
+                    <input name="phone" class="form-control"/>
+                </div>
+                <div class="input-group mb-2">
+                    <span class="input-group-text">주소</span>
+                    <input name="address" class="form-control" readonly/> <!--읽을 수만 있다. 입력 안됨 readonly-->
+                    <button id ="btn-search" type = "button" class="btn btn-primary">검색</button>
+                </div>
+                <div class="text-center mt-3">
+                    <button class="btn btn-primary px-5">저장</button>
+                    <button type="reset" class="btn btn-secondary px-5">취소</button>
+                    <!--리셋 누르면 값 초기화 됨-->
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type = "module">
+    import { app } from "/javascripts/firebaseInit.js";
+    import { getFirestore, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+    const db = getFirestore(app);
+    const uid = sessionStorage.getItem("uid");
+    const email = sessionStorage.getItem("email");
+    let user;
+
+    $(window).on("load", async function(){
+        const snapshot = await getDoc(doc(db,`users/${uid}`));
+        if(snapshot.data()){
+            user = snapshot.data();
+            $(frm.name).val(user.name);
+            $(frm.phone).val(user.phone);
+            $(frm.address).val(user.address);
+        }
+        
+    });
+
+    $("#file").on("change", function(e){
+        $("#photo").attr("src", URL.createObjectURL(e.target.files[0]));
+    });
+    $("#photo").on("click", function(e){
+        $("#file").click();
+    })
+
+    $(frm).on("submit", async function(e){
+        e.preventDefault();
+        const name = $(frm.name).val();
+        const phone = $(frm.phone).val();
+        const address = $(frm.address).val();
+        if(name == ""){
+            alert("이름을 입력하세요!!!!!")
+            $(frm.name).focus();
+            return;
+        }
+        if(phone == ""){
+            alert("전화번호 입력하세요!!!!")
+            $(frm.phone).focus();
+            return;
+        }
+        if(address == ""){
+            alert("주소를 입력하세요!!!!")  //이건 포커스 할 필요없다. 검색해서 받기 때문
+            return;
+        }
+        if(confirm("사용자 정보를 저장하실래요?")){
+            await setDoc(doc(db,`users/${uid}`),{ //비동기 함수이다. setDoc
+                email:email,
+                name:name,
+                phone:phone,
+                address:address
+                
+            });
+            alert("사용자 정보가 변경되었습니다.");
+            location.href="/";
+        }
+    });
+
+    $("#btn-search").on("click", function(){
+        new daum.Postcode({
+            oncomplete: function(data){
+                console.log(data);
+                const address = data.roadAddress; //로드 어드레스를 통해 클릭한 주소를 입력창에 가져온다, 위에 주소창 이름을 address에 줌
+                const building = data.buildingName ? `(${data.buildingName})` : '';
+                $(frm.address).val(address + building); //address를 가져옴 즉 주소 인풋 창에 불러옴
+            }
+        }).open();
+    });
+</script>
