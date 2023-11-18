@@ -1,20 +1,30 @@
 <div class="my-5">
     <h1 class="text-center mb-5">게시판</h1>
-    <div class="text-end">
-        <button id="btn-insert" class="btn btn-primary">글쓰기</button>
-    </div>
+        <div class="row">
+            <div class="col" >
+                게시판: <span id = "total"></span>건
+            </div>
+            <div class="col text-end">
+                    <button id="btn-insert" class="btn btn-primary">글쓰기</button>
+            </div>
+        </div>
+    <hr>
     
     <div id="div_posts"></div>
+    <div id="pagination" class="pagination justify-content-center mt-5"></div>
 </div>
 <script id="temp_posts" type="x-handlebars-template">
 
     <table class = "table table-striped table-hover">
+        <thead class = "table-dark">
         <tr class="text-center">
-            <td>제목</td><td>작성자</td><td>작성일</td>
+            <td></td><td>제목</td><td>작성자</td><td>작성일</td>
             </tr>
+        </thead>
         {{#each .}}
-          <tr>
-            <td>{{title}}</td>
+          <tr class = "text-center">
+            <td>{{index}}</td>
+            <td><a href="/posts/read?id={{id}}">{{title}}</a></td>
             <td>{{email}}</td>
             <td>{{date}}</td>
           </tr>
@@ -28,16 +38,36 @@
     import { getFirestore,collection } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
     import { query,orderBy,getDocs,where,doc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
     const db = getFirestore(app);
-    const email=sessionStorage.getItem('email');
+    let page = 1;
+    const size = 3;
+    let total = 0;
+
+    //const email=sessionStorage.getItem('email');
     getPosts();
     async function getPosts(){
         const q = query(collection(db, 'posts'), orderBy("date","desc"));
         const snapshot = await getDocs(q);
+        $("#total").html(snapshot.docs.length);
+        //토탈 페이지 구하기
+        if(total != snapshot.docs.length){
+            total = snapshot.docs.length;
+            const totalPages = Math.ceil(total/size);
+            $("#pagination").twbsPagination("changeTotalPages", totalPages, 1);
+        }
+        //현재 페이지의 목록
         let rows = [];
-        snapshot.docs.forEach(doc=>{
-            const row={id:doc.id, ...doc.data()}
+        snapshot.docs.forEach((doc, index)=>{
+            //const row={id:doc.id, ...doc.data()}
             //console.log(row);
-            rows.push(row);
+            const start =(page-1)*size;
+            const end =(page*size)-1;
+            if(index >= start && index <= end){
+                rows.push({
+                    index:index+1,id:doc.id,...doc.data()
+});
+
+            }
+                    
         });
         //console.log(rows);
         const temp=Handlebars.compile($("#temp_posts").html());
@@ -51,5 +81,32 @@
         }else{
             location.href = "/posts/insert";
         }
+    });
+    $('#pagination').twbsPagination({
+
+        totalPages:10, //총 페이지 번호 수
+    
+        visiblePages: 5, // 하단에서 한 번에 보여 지는 페이지 번호 수
+    
+        startPage : 1, // 시작 시 표시되는 현재 페이지
+    
+        initiateStartPageClick: false, // 플러그인이 시작 시 페이지 버튼 클릭 여부 (default : true) 
+    
+        first : '<<', // 페이지네이션 버튼 중 처음으로 돌아가는 버튼에 쓰여 있는 텍스트
+    
+        prev : '<', // 이전 페이지 버튼에 쓰여 있는 텍스트
+    
+        next : '>', // 다음 페이지 버튼에 쓰여 있는 텍스트
+    
+        last : '>>', // 페이지네이션 버튼 중 마지막으로 가는 버튼에 쓰여 있는 텍스트
+    
+        onPageClick: function (event, clickPage) {
+    
+             page=clickPage;
+    
+             getPosts(); 
+    
+        }
+    
     });
 </script>
