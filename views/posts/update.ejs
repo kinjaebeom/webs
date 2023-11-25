@@ -1,0 +1,39 @@
+<div class="my-5">
+    <h1 class="text-center mb-5"><%=title%></h1>
+    <div id="div_post"></div>
+</div>
+<script id="temp_post" type="x-handlebar-template">
+    <form name="frm">
+        <input value="{{title}}" " name="title" placeholder="제목을 입력하세요 제발.." class="form-control mb-2">
+        <textarea name="body" rows="10" class="form-control" placeholder="내용 입력하세요 제발..">{{body}}</textarea>
+        <div class="text-center my-3">
+            <button class="btn btn-primary px-5" type="submit">수정</button> <!--px는 안쪽여백, reset기능은 입력한거 없애줌-->
+            <button class="btn btn-primary px-5" type="reset">취소</button>
+        </div>
+    </form>
+
+</script>
+
+<script type="module">
+    import { app } from "/javascripts/firebaseInit.js";
+    import { getFirestore, setDoc, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+    const db = getFirestore(app);
+    const id = "<%=id%>";
+    const snapshot = await getDoc(doc(db,`posts/${id}`));
+    const post = snapshot.data();
+    //console.log(id);
+    const temp = Handlebars.compile($("#temp_post").html());
+    $("#div_post").html(temp(post));
+
+    $(frm).on("submit",async function(e){
+        e.preventDefault();
+        if(confirm(`${id}번 게시글을 수정하실래요?`)){
+            //수정하기
+           await setDoc(doc(db, `posts/${id}`),{...post,  //...을 붙임으로 인해 모든 값을 다 가져옴 ㅋ(작성한 날짜 등등)
+                title:$(frm.title).val(),
+                body:$(frm.body).val()});
+                alert("수정완료");
+                location.href = "/posts";
+        }
+    });
+</script>

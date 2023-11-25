@@ -15,6 +15,10 @@ router.get('/read', function(req, res, next){//앞에 posts가 생략되어있�
     const id = req.query.id;
     res.render('index', {title:'게시글정보', pageName:'posts/read.ejs',id});
 });
+router.get('/update', function(req, res, next){//앞에 posts가 생략되어있음 즉 posts/이거임
+    const id = req.query.id;
+    res.render('index', {title:'게시글 수정', pageName:'posts/update.ejs',id});
+});
 
 
 module.exports = router;
